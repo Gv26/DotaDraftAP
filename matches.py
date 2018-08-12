@@ -227,11 +227,12 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
 
     matches_requested = 100
     no_abandon_leaver_status = {0, 1}
+    new_matches_fetched = 0
     num_matches_fetched = 0
+    new_matches = []
     seq_num = search_start_seq_num
     # Loop through GetMatchHistoryBySequenceNum responses from smallest to largest sequence number.
     while seq_num < end_search_seq_num:
-        new_matches = []
         for attempt in range(20):
             try:
                 response = get_match_history_by_seq_num(seq_num, matches_requested)
@@ -294,23 +295,29 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
                                  'game_mode': match_game_mode, 'lobby_type': match_lobby_type,
                                  'picks_radiant': picks_radiant, 'picks_dire': picks_dire}
                         new_matches.append(match)
-                        num_matches_fetched += 1
+                        new_matches_fetched += 1
 
-            # Write database to file for every API response that gives new matches.
-            if new_matches:
+            # Check if we are in the final loop.
+            seq_num = 1 + api_matches[-1]['match_seq_num']
+            final_loop = len(api_matches) < matches_requested or seq_num >= end_search_seq_num
+
+            # Write database to file when enough matches have been fetched.
+            if new_matches_fetched >= 1000 or final_loop:
                 try:
                     with open(filename) as data:
                         construct = json.load(data)
                 except FileNotFoundError:
-                    construct = {'matches': []}
-                construct['data_size'] = data_size + num_matches_fetched
+                    construct = {'data_size': 0, 'matches': []}
+                construct['data_size'] += new_matches_fetched
+                num_matches_fetched += new_matches_fetched
+                new_matches_fetched = 0
                 construct['matches'].extend(new_matches)
+                new_matches = []
                 write_json_data(filename, construct)
 
-            # Stop gathering data after reaching the most recent matches played.
-            if len(api_matches) < matches_requested:
+            # Stop gathering data if we are in the final loop.
+            if final_loop:
                 break
-            seq_num = 1 + api_matches[-1]['match_seq_num']
 
             # Print completion details about data fetched so far.
             completion = 100 * (seq_num - search_start_seq_num) / (end_search_seq_num - search_start_seq_num)
@@ -319,8 +326,8 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
             print('Sequence number {} statusDetail: {}'.format(seq_num, result['statusDetail']))
             seq_num += 1
 
-    print('Fetched ' + str(num_matches_fetched) + ' new matches.')
-    print('Total size is ' + str(data_size) + ' matches.')
+    print('Fetched {} new matches.'.format(num_matches_fetched))
+    print('Total size is {} matches.'.format(data_size + num_matches_fetched))
 
 
 if __name__ == '__main__':
