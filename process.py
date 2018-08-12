@@ -45,7 +45,7 @@ def process_data(input_file, output_file, start_match_id, end_match_id):
             dire.append(picks_dire)
             labels.append(radiant_win)
             match_ids.append(match_id)
-    processed = {'radiant': radiant, 'dire': dire,  'radiant_win': labels, 'match_ids': match_ids}
+    processed = {'picks_radiant': radiant, 'picks_dire': dire,  'radiant_win': labels, 'match_ids': match_ids}
     write_json_data(output_file, processed)
 
 
