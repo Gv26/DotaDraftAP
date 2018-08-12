@@ -314,6 +314,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
                 construct['matches'].extend(new_matches)
                 new_matches = []
                 write_json_data(filename, construct)
+                del construct
 
             # Stop gathering data if we are in the final loop.
             if final_loop:
