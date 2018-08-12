@@ -201,8 +201,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
             print('start_match_id: ' + start_match_result['error'])
             return
         start_seq_num = start_match_result['match_seq_num']
-        # search_start_seq_num = start_seq_num - max_match_length
-        search_start_seq_num = start_seq_num
+        search_start_seq_num = start_seq_num - max_match_length
 
     # Setup end sequence number.
     if end_match_id == 'latest':
