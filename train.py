@@ -127,13 +127,17 @@ if __name__ == '__main__':
 
     heroes = hero_dicts()
     hero_map = one_hot_matrix(heroes_count)
+    radiant = [22, 71, 42, 70]
+    dire = [37, 5, 99, 67, 82]
     for h in heroes:
-        test_input = np.array([picks_vector([h['id'], 22, 71, 20, 70], [37, 5, 99, 67, 82], heroes_count, hero_map)])
+        test_input = np.array([picks_vector(radiant + [h['id']], dire, heroes_count, hero_map)])
         h['radiant_win'] = model.predict(test_input)[0, 0]
     sorted_heroes = sorted(heroes, key=itemgetter('radiant_win'), reverse=True)
+    current_picks = set(radiant + dire)
     counter = 0
     for h in sorted_heroes:
-        print('{:3} {:20} {:6.6}'.format(h['id'], h['localized_name'], str(h['radiant_win'])))
-        counter += 1
-        if counter > 60:
-            break
+        if h['id'] not in current_picks:
+            print('{:3} {:20} {:6.6}'.format(h['id'], h['localized_name'], str(h['radiant_win'])))
+            counter += 1
+            if counter > 40:
+                break
