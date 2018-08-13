@@ -277,7 +277,8 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
                                 leavers = True
                                 break
                         except KeyError:  # Bots do not have key 'leaver_status'.
-                            continue
+                            leavers = True
+                            break
                         player_slot = bin(p['player_slot'])[2:].zfill(8)  # int to 8-bit binary string.
                         player_dire = int(player_slot[0])  # 0 is Radiant and 1 is Dire.
                         hero_id = p['hero_id']
