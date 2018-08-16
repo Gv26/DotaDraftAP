@@ -219,11 +219,10 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
         with open(filename) as data:
             database = json.load(data)
         data_size = database['data_size']
-        matches = database['matches']
+        match_id_set = {m['match_id'] for m in database['matches']}
     except FileNotFoundError:
         data_size = 0
-        matches = []
-    match_id_set = {m['match_id'] for m in matches}
+        match_id_set = set()
 
     matches_requested = 100
     no_abandon_leaver_status = {0, 1}
@@ -303,7 +302,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
             final_loop = len(api_matches) < matches_requested or seq_num >= end_search_seq_num
 
             # Write database to file when enough matches have been fetched.
-            if new_matches_fetched >= 1000 or final_loop:
+            if new_matches_fetched >= 5000 or final_loop:
                 try:
                     with open(filename) as data:
                         construct = json.load(data)
