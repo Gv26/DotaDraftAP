@@ -15,7 +15,7 @@ human_players = 10
 # Match IDs from which to fetch data.
 # Set "start_match_id = None" to find and use the first match of the current patch.
 # Set to "start_match_id = 'latest'" to use the most recent match stored in the local database.
-start_match_id = None  # Patch 7.19 begins on match 4032019767.
+start_match_id = None  # Patch 7.25 begins on match 5298181556.
 # Set "end_match_id = 'latest'" to use the most recent match played.
 end_match_id = 'latest'
 
