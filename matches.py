@@ -32,7 +32,7 @@ def rate_limited(request_period, last_call_time, request_function, *args, **kwar
         last_call_time = time.perf_counter()
         status = response.status_code
         if status == 429 or status == 503:  # 429 Too Many Requests, 503 Service Unavailable.
-            print('HTTP status code: {}. Waiting before retrying.'.format(status))
+            print(f'HTTP status code: {status}. Waiting before retrying.')
             time.sleep(30)
             continue
         break
@@ -100,10 +100,10 @@ def latest_match_id():
                 latest_id = result['matches'][0]['match_id']
                 return latest_id
             else:
-                print('latest_match_id statusDetail: ' + result['statusDetail'])
+                print('latest_match_id statusDetail: {}' + result['statusDetail'])
                 break
         else:
-            print('HTTP status code: {}. Waiting to retry...'.format(request_status))
+            print(f'HTTP status code: {request_status}. Waiting to retry...')
             time.sleep(30)
     else:
         raise requests.exceptions.RetryError('latest_match_id exceeded maximum number of attempts.')
@@ -177,7 +177,7 @@ def current_patch_match_id():
         else:
             print('Failed to find first match ID of current patch.')
             return
-    print('Fetched patch match ID ({}). {} OpenDota API calls made.'.format(match_id_upper, api_calls))
+    print(f'Fetched patch match ID ({match_id_upper}). {api_calls} OpenDota API calls made.')
     return match_id_upper
 
 
@@ -189,7 +189,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
         try:
             search_start_seq_num = greatest_database_seq_num(filename)
         except FileNotFoundError:
-            print("{} not found. Cannot use start_match_id = 'latest' in config.".format(filename))
+            print(f"{filename} not found. Cannot use start_match_id = 'latest' in config.")
             return
         start_match_id = smallest_database_match_id(filename)
     else:
@@ -321,14 +321,14 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
                 break
 
             # Print completion details about data fetched so far.
-            completion = 100 * (seq_num - search_start_seq_num) / (end_search_seq_num - search_start_seq_num)
-            print('Progress: {:6.6}% (sequence number {:>11})'.format(str(completion), seq_num))
+            completion = (seq_num - search_start_seq_num) / (end_search_seq_num - search_start_seq_num)
+            print(f'Progress: {completion:>7.3%} (sequence number {seq_num})')
         else:
-            print('Sequence number {} statusDetail: {}'.format(seq_num, result['statusDetail']))
+            print(f'Sequence number {seq_num} statusDetail: ' + result['statusDetail'])
             seq_num += 1
 
-    print('Fetched {} new matches.'.format(num_matches_fetched))
-    print('Total size is {} matches.'.format(data_size + num_matches_fetched))
+    print(f'Fetched {num_matches_fetched} new matches.')
+    print(f'Total size is {data_size + num_matches_fetched} matches.')
 
 
 if __name__ == '__main__':
